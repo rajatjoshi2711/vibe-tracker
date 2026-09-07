@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CopyButton } from "@/components/CopyButton";
 import { EditForm } from "@/components/EditForm";
 
 export function ItemRow({
@@ -62,9 +63,12 @@ export function ItemRow({
             <div className="mt-2 flex flex-col gap-2 ef-rise">
               {description && <p className="ef-small text-neutral-600 whitespace-pre-wrap">{description}</p>}
               {prompt && (
-                <pre className="ef-caption font-mono bg-neutral-50 border border-[color:var(--border-subtle)] rounded-[10px] p-3 whitespace-pre-wrap break-words">
-                  {prompt}
-                </pre>
+                <div className="flex items-start gap-2">
+                  <pre className="flex-1 min-w-0 ef-caption font-mono bg-neutral-50 border border-[color:var(--border-subtle)] rounded-[10px] p-3 whitespace-pre-wrap break-words">
+                    {prompt}
+                  </pre>
+                  <CopyButton text={prompt} />
+                </div>
               )}
             </div>
           )}
