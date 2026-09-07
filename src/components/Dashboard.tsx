@@ -46,6 +46,15 @@ export function Dashboard() {
     setProjects((prev) => prev!.filter((p) => p.id !== id));
   }
 
+  async function editProject(
+    id: string,
+    data: { name: string; description: string; prompt: string }
+  ) {
+    const payload = { name: data.name, description: data.description || null, prompt: data.prompt || null };
+    await api(`/api/projects/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
+    setProjects((prev) => prev!.map((p) => (p.id === id ? { ...p, ...payload } : p)));
+  }
+
   async function addIdea(
     projectId: string | undefined,
     data: { name: string; description: string; prompt: string }
@@ -77,6 +86,15 @@ export function Dashboard() {
     setIdeas((prev) => prev.filter((i) => i.id !== id));
   }
 
+  async function editIdea(id: string, data: { name: string; description: string; prompt: string }) {
+    const payload = { name: data.name, description: data.description || null, prompt: data.prompt || null };
+    await api(`/api/ideas/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
+    setProjects((prev) =>
+      prev!.map((p) => ({ ...p, ideas: p.ideas.map((i) => (i.id === id ? { ...i, ...payload } : i)) }))
+    );
+    setIdeas((prev) => prev.map((i) => (i.id === id ? { ...i, ...payload } : i)));
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -96,9 +114,11 @@ export function Dashboard() {
               project={project}
               onToggleProject={toggleProject}
               onDeleteProject={deleteProject}
+              onEditProject={editProject}
               onAddIdea={(projectId, data) => addIdea(projectId, data)}
               onToggleIdea={toggleIdea}
               onDeleteIdea={deleteIdea}
+              onEditIdea={editIdea}
             />
           ))}
         </div>
@@ -123,6 +143,7 @@ export function Dashboard() {
                   done={idea.done}
                   onToggle={() => toggleIdea(idea.id, !idea.done)}
                   onDelete={() => deleteIdea(idea.id)}
+                  onEdit={(data) => editIdea(idea.id, data)}
                 />
               ))}
             </div>

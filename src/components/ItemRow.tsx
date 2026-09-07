@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EditForm } from "@/components/EditForm";
 
 export function ItemRow({
   name,
@@ -9,6 +10,7 @@ export function ItemRow({
   done,
   onToggle,
   onDelete,
+  onEdit,
 }: {
   name: string;
   description: string | null;
@@ -16,9 +18,28 @@ export function ItemRow({
   done: boolean;
   onToggle: () => Promise<void>;
   onDelete: () => Promise<void>;
+  onEdit: (data: { name: string; description: string; prompt: string }) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
   const hasDetails = Boolean(description || prompt);
+
+  if (editing) {
+    return (
+      <div className="border-b border-[color:var(--border-subtle)] last:border-b-0 py-3 pl-7">
+        <EditForm
+          initialName={name}
+          initialDescription={description}
+          initialPrompt={prompt}
+          onCancel={() => setEditing(false)}
+          onSave={async (data) => {
+            await onEdit(data);
+            setEditing(false);
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="border-b border-[color:var(--border-subtle)] last:border-b-0 py-3">
@@ -48,14 +69,23 @@ export function ItemRow({
             </div>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => onDelete()}
-          aria-label="Delete"
-          className="ef-caption text-neutral-400 hover:text-[color:var(--danger)] shrink-0"
-        >
-          Remove
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="ef-caption text-neutral-400 hover:text-[color:var(--blue-500)]"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete()}
+            aria-label="Delete"
+            className="ef-caption text-neutral-400 hover:text-[color:var(--danger)]"
+          >
+            Remove
+          </button>
+        </div>
       </div>
     </div>
   );
