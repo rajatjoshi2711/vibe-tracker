@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vibe Tracker
 
-## Getting Started
+Track your vibe coding projects: existing projects, feature ideas for them, and standalone new project ideas. Everything has a name, an optional description, and an optional prompt, and can be struck off once it's done.
 
-First, run the development server:
+Built with Next.js (App Router), Prisma, Neon Postgres, and NextAuth (email + password).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Local setup
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Create a Neon Postgres database at [neon.tech](https://neon.tech) (or `vercel storage create` if using the Vercel-Neon integration). Copy the pooled connection string and the direct connection string.
 
-## Learn More
+3. Copy `.env.example` to `.env` and fill in:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   DATABASE_URL="<pooled Neon connection string>"
+   DIRECT_URL="<direct Neon connection string>"
+   AUTH_SECRET="<generate with: npx auth secret>"
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Push the schema to your database:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npx prisma db push
+   ```
 
-## Deploy on Vercel
+5. Run the dev server:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Visit `http://localhost:3000`, create an account, and start adding projects.
+
+## Deploying to Vercel
+
+1. Push this repo to GitHub (already wired to `https://github.com/rajatjoshi2711/vibe-tracker`).
+2. Import the repo into Vercel.
+3. Add the Neon integration (or paste `DATABASE_URL` / `DIRECT_URL` manually) and set `AUTH_SECRET` in the Vercel project's environment variables.
+4. Deploy. Prisma's `postinstall` script (`prisma generate`) runs automatically on build.
+5. After the first deploy, run `npx prisma db push` locally (pointed at the production `DATABASE_URL`) to create the tables, or wire it into a release step.
+
+## Data model
+
+- **Project** — an existing project you're tracking. Has a name, description, prompt, and a done flag.
+- **Idea** — either a feature idea tied to a project (`projectId` set) or a standalone new-project idea (`projectId` is null). Same shape as a project: name, description, prompt, done.
